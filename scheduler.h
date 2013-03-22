@@ -6,9 +6,6 @@
 //
 //
 
-//NOTE all tasks should be void myTask();
-// The first frame to execute is frame 1 (not 0)
-
 #ifndef scheduler_scheduler_h
 #define scheduler_scheduler_h
 
@@ -21,7 +18,7 @@
 #define MAX_TASKS_PER_FRAME 2  /* Maximum periodic tasks per frame */
 #define QUEUE_SIZE 20
 
-/* A two dimensional array of function pointers to the task schedule
+/* A two dimensional array of Task pointers of the task schedule
  Each row corresponds to a frame. The row contains pointers to the
  tasks to be exectuted in the frame in order. The last task to be
  executed should be followed by NULL. Denoted by L(k) on page 91
@@ -30,10 +27,12 @@ Task * tasks[FRAMES][MAX_TASKS_PER_FRAME] =
 {   /* Frame 1*/ {&taskA,NULL},
     /* Frame 2*/ {NULL,NULL},
     /* Frame 3*/ {&taskA,NULL},
-    /* Frame 4*/ {&taskA,NULL},
+    /* Frame 4*/ {&taskB,NULL},
     /* Frame 5*/ {&taskA,NULL},
 };
 
+
+/* APERIODIC and SPORADIC queues */
 typedef struct
 {
     Task * arr[QUEUE_SIZE];
@@ -49,6 +48,7 @@ void scheduler();
 
 /***************** QUEUE OPERATIONS *************************/
 
+/* Insert a task into the queue*/ 
 int queueInsert(Task * tsk, Cqueue * q)
 {
     if(q->front == (q->rear+1)%QUEUE_SIZE)
@@ -82,6 +82,7 @@ int isEmpty(Cqueue * q)
     return 0;
 }
 
+/* remove a task from the queue */ 
 Task * queueRemove(Cqueue * q)
 {
     Task * item;

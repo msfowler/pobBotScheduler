@@ -16,7 +16,7 @@ typedef struct
     int executionTime;
 } Task;
 
-
+/*********** TASK A ***********/
 void taskAfunction()
 {
     printf("Hello I am task A!\n"); 
@@ -25,6 +25,7 @@ void taskAfunction()
 
 Task taskA = { .taskFunction = taskAfunction, .executionTime = 3 };
 
+/*********** TASK B ***********/
 void taskBfunction()
 {
     printf("Hello I am task B!\n");
@@ -32,6 +33,8 @@ void taskBfunction()
 }
 
 Task taskB = { .taskFunction = taskBfunction, .executionTime = 1 };
+
+/*********** TASK C ***********/
 
 void taskCfunction()
 {

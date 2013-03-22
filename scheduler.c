@@ -13,19 +13,19 @@
 
 void scheduler()
 {
-    int t = 0;      /* current time */
-    int k = 0;      /* current frame */
+    int t = 0;          /* current time */
+    int k = 0;          /* current frame */
     int taskIdx = 0;    /* keeps track what task we're on */
-    int idle = 1;
+    int idle = 1;       /* keeps track if we executed a task or not */
     
     while(1)
     {
         idle = 1;
-        sleep(1); // FOR DEBUG ONLY!
+        //sleep(1); // FOR DEBUG ONLY!
         
         /* t is not incremented here like it is in the book, this is
          because we don't have timers. t is incremented by the execution
-         time when a task is scheduled. */
+         time when a task is scheduled or when it idles */
         k = (t/FRAME_SIZE)%FRAMES;
         
         /* Assumption: no tasks run over... since we don't have a timer, this
@@ -35,7 +35,7 @@ void scheduler()
         if(tasks[k][taskIdx] != NULL && taskIdx < MAX_TASKS_PER_FRAME)
         {
             /* simulate the passage of time */
-            printf("Scheduler executing a task t=%d, k=%d, taskIdx=%d\n", t, k, taskIdx);
+            //DEBUG: printf("Scheduler executing a task t=%d, k=%d, taskIdx=%d\n", t, k, taskIdx);
             t += tasks[k][taskIdx]->executionTime;
             tasks[k][taskIdx]->taskFunction();
             idle = 0;
@@ -53,7 +53,8 @@ void scheduler()
         } 
         else   
         {
-            if(!isEmpty(&aperiodicQ)) /* execute APERIODIC tasks */
+            /* execute APERIODIC tasks */
+            if(!isEmpty(&aperiodicQ)) 
             {
                 int remainingTime = FRAME_SIZE - (t%FRAME_SIZE);
                 
@@ -62,7 +63,7 @@ void scheduler()
                  unless you have enough time in the frame */
             
                 Task * newTask = queuePeek(&aperiodicQ);
-                printf("t= %d Remaining Time: %d execution: %d\n", t,  remainingTime, newTask->executionTime);
+                // DEBUG printf("t= %d Remaining Time: %d execution: %d\n", t,  remainingTime, newTask->executionTime);
                 if(newTask->executionTime <= remainingTime)
                 {
                     /* execute it */
@@ -73,7 +74,8 @@ void scheduler()
                 }
             }
             
-            if(!isEmpty(&sporadicQ)) /* sporadic */
+            /* execute SPORADIC tasks */
+            if(!isEmpty(&sporadicQ)) 
             {
                 int remainingTime = FRAME_SIZE - (t%FRAME_SIZE);
                 
@@ -97,7 +99,7 @@ void scheduler()
         if(idle)
         {
             /* no tasks were executed, advance the clock anyways */
-            printf("Idling... t=%d frame=%d\n", t, k); 
+            // DEBUG: printf("Idling... t=%d frame=%d\n", t, k);
             t++;
         }
 

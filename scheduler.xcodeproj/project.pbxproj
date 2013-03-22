@@ -6,10 +6,19 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXFileReference section */
+		96DC398016FB9E84008A56D4 /* scheduler.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = scheduler.c; sourceTree = "<group>"; };
+		96DC398116FB9EAA008A56D4 /* scheduler.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = scheduler.h; sourceTree = "<group>"; };
+		96DC398416FBA868008A56D4 /* tasks.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = tasks.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
 /* Begin PBXGroup section */
 		96DC397716FB9E52008A56D4 = {
 			isa = PBXGroup;
 			children = (
+				96DC398016FB9E84008A56D4 /* scheduler.c */,
+				96DC398116FB9EAA008A56D4 /* scheduler.h */,
+				96DC398416FBA868008A56D4 /* tasks.h */,
 			);
 			sourceTree = "<group>";
 		};
