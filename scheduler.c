@@ -9,7 +9,7 @@
 #include <stdio.h>
 
 #include "scheduler.h"
-#include "tasks.h"
+
 
 void scheduler()
 {
@@ -21,7 +21,7 @@ void scheduler()
     while(1)
     {
         idle = 1;
-        //sleep(1); // FOR DEBUG ONLY!
+        sleep(1); // FOR DEBUG ONLY!
         
         /* t is not incremented here like it is in the book, this is
          because we don't have timers. t is incremented by the execution
@@ -35,7 +35,7 @@ void scheduler()
         if(tasks[k][taskIdx] != NULL && taskIdx < MAX_TASKS_PER_FRAME)
         {
             /* simulate the passage of time */
-            //DEBUG: printf("Scheduler executing a task t=%d, k=%d, taskIdx=%d\n", t, k, taskIdx);
+            printf("t=%d frame=%d \texecuting PERIODIC task: \t", t, k);
             t += tasks[k][taskIdx]->executionTime;
             tasks[k][taskIdx]->taskFunction();
             idle = 0;
@@ -54,7 +54,7 @@ void scheduler()
         else   
         {
             /* execute APERIODIC tasks */
-            if(!isEmpty(&aperiodicQ)) 
+            if(!isEmpty(aperiodicQ)) 
             {
                 int remainingTime = FRAME_SIZE - (t%FRAME_SIZE);
                 
@@ -62,20 +62,20 @@ void scheduler()
                 /* Since we can't premept jobs in this setup, don't run aperiodic tasks
                  unless you have enough time in the frame */
             
-                Task * newTask = queuePeek(&aperiodicQ);
-                // DEBUG printf("t= %d Remaining Time: %d execution: %d\n", t,  remainingTime, newTask->executionTime);
+                Task * newTask = queuePeek(aperiodicQ);
                 if(newTask->executionTime <= remainingTime)
                 {
                     /* execute it */
+                    printf("t=%d frame=%d \texecuting APERIODIC task: \t", t, k);
                     t += newTask->executionTime;
                     newTask->taskFunction();
-                    queueRemove(&aperiodicQ);
+                    queueRemove(aperiodicQ);
                     idle = 0;
                 }
             }
             
             /* execute SPORADIC tasks */
-            if(!isEmpty(&sporadicQ)) 
+            if(!isEmpty(sporadicQ)) 
             {
                 int remainingTime = FRAME_SIZE - (t%FRAME_SIZE);
                 
@@ -84,13 +84,20 @@ void scheduler()
                  get run at all because late is worse than never, and is thus 
                  removed whether it runs or not */ 
                 
-                Task * newTask = queueRemove(&sporadicQ);
+                Task * newTask = queueRemove(sporadicQ);
+                
                 if(newTask->executionTime <= remainingTime)
                 {
                     /* execute it */
+                    printf("t=%d frame=%d \texecuting SPORADIC task: \t", t, k);
                     t += newTask->executionTime;
                     newTask->taskFunction();
                     idle = 0;
+
+                }
+                else
+                {
+                    printf("t=%d frame=%d \t!!!!DISCARDED SPORADIC TASK!!! ", t, k);
                 }
             }
                 
@@ -99,7 +106,7 @@ void scheduler()
         if(idle)
         {
             /* no tasks were executed, advance the clock anyways */
-            // DEBUG: printf("Idling... t=%d frame=%d\n", t, k);
+              printf("t=%d frame=%d \tIdling...\n", t, k);
             t++;
         }
 
@@ -119,9 +126,8 @@ int main(void)
     printf("Here we go...\n");
 
     // Make some aperiodic tasks
-    queueInsert(&taskB, &aperiodicQ);
-    queueInsert(&taskC, &aperiodicQ);
-    
+    approachTrack(); 
+
     scheduler();
     
     return 0; 

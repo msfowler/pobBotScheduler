@@ -13,10 +13,31 @@
 #include "tasks.h"
 
 
-#define FRAMES 5                /* Frames per hyperperiod */
-#define FRAME_SIZE 5
-#define MAX_TASKS_PER_FRAME 2  /* Maximum periodic tasks per frame */
+#define FRAMES 4                /* Frames per hyperperiod */
+#define FRAME_SIZE 10
+#define MAX_TASKS_PER_FRAME 10  /* Maximum periodic tasks per frame */
 #define QUEUE_SIZE 20
+
+extern Task lookLeftTask;
+extern Task lookRightTask;
+extern Task lookCenterTask;
+extern Task lookLeftCenterTask;
+extern Task lookRightCenterTask;
+extern Task realignCenterTask;
+extern Task captureImgLeftTask;
+extern Task captureImgRightTask;
+extern Task captureImgCenterTask;
+extern Task captureImgLeftCenterTask;
+extern Task captureImgRightCenterTask;
+extern Task decipherImgLeftTask;
+extern Task decipherImgRightTask;
+extern Task decipherImgCenterTask;
+extern Task decipherImgLeftCenterTask;
+extern Task decipherImgRightCenterTask;
+extern Task initiateCrossingTask;
+extern Task crossTrackTask;
+extern Task avoidRobotTask;
+extern Task approachTrackTask;
 
 /* A two dimensional array of Task pointers of the task schedule
  Each row corresponds to a frame. The row contains pointers to the
@@ -24,11 +45,10 @@
  executed should be followed by NULL. Denoted by L(k) on page 91
  in the book by Liu. */
 Task * tasks[FRAMES][MAX_TASKS_PER_FRAME] =
-{   /* Frame 1*/ {&taskA,NULL},
-    /* Frame 2*/ {NULL,NULL},
-    /* Frame 3*/ {&taskA,NULL},
-    /* Frame 4*/ {&taskB,NULL},
-    /* Frame 5*/ {&taskA,NULL},
+{   /* Frame 1*/ {&lookLeftTask, &captureImgLeftTask, &lookLeftCenterTask, &captureImgLeftCenterTask, &lookCenterTask, NULL, NULL, NULL, NULL, NULL},
+    /* Frame 2*/ {&captureImgCenterTask, &lookRightCenterTask, &captureImgRightCenterTask, &lookRightTask, &captureImgRightTask, &decipherImgLeftTask, &decipherImgLeftCenterTask, &decipherImgCenterTask, NULL, NULL},
+    /* Frame 3*/ {&decipherImgRightCenterTask, &decipherImgRightTask, &realignCenterTask, &initiateCrossingTask, NULL, NULL, NULL, NULL, NULL, NULL},
+    /* Frame 4*/ {NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL}
 };
 
 
@@ -40,8 +60,11 @@ typedef struct
     int front;
 }Cqueue;
 
-Cqueue aperiodicQ = { .rear = -1, .front = -1};
-Cqueue sporadicQ = { .rear = -1, .front = -1};
+Cqueue _aperiodicQ = { .rear = -1, .front = -1};
+Cqueue _sporadicQ = { .rear = -1, .front = -1};
+
+void * aperiodicQ = (void *)&_aperiodicQ;
+void * sporadicQ = (void *)&_sporadicQ;
 
 void scheduler();
 
@@ -49,8 +72,10 @@ void scheduler();
 /***************** QUEUE OPERATIONS *************************/
 
 /* Insert a task into the queue*/ 
-int queueInsert(Task * tsk, Cqueue * q)
+int queueInsert(Task * tsk, void * queue)
 {
+    Cqueue * q = (Cqueue *)queue; 
+    
     if(q->front == (q->rear+1)%QUEUE_SIZE)
     {
         return -1; /* queue is FULL */
@@ -72,8 +97,9 @@ int queueInsert(Task * tsk, Cqueue * q)
     return 0;
 }
 
-int isEmpty(Cqueue * q)
+int isEmpty(void * queue)
 {
+    Cqueue * q = (Cqueue *)queue; 
     if(q->front == -1)
     {
         return 1;
@@ -83,9 +109,10 @@ int isEmpty(Cqueue * q)
 }
 
 /* remove a task from the queue */ 
-Task * queueRemove(Cqueue * q)
+Task * queueRemove(void * queue)
 {
     Task * item;
+    Cqueue * q = (Cqueue *)queue;
     
     if(q->front == -1)
     {
@@ -110,9 +137,10 @@ Task * queueRemove(Cqueue * q)
 }
 
 /* return front of queue without actually removing it from the queue */
-Task * queuePeek(Cqueue * q)
+Task * queuePeek(void * queue)
 {
     Task * item;
+    Cqueue * q = (Cqueue *)queue;
     
     if(q->front == -1)
     {
